@@ -32,7 +32,8 @@ export default class Mock extends Component{
     onUsersNumberChange(e)
     {
         this.setState({
-            userNumber: e.target.value
+            userNumber: e.target.value,
+            btnDisables : false
           })
     }
 
@@ -42,43 +43,39 @@ export default class Mock extends Component{
         const numbreUserToadd  = 100 - this.state.userNumber
 
         if(numbreUserToadd > 0){
-            const users = []
+
             const user = {
                 username : '',
-                gender : '',
+                gendre : '',
                 dob : '',
                 news : true,
                 email : '',
                 photo : ''
             } 
-           /* axios.get("https://randomuser.me/api/?results="+1)
+           axios.get("https://randomuser.me/api/?results="+numbreUserToadd)
                 .then(res => {
-                    //console.log(res.data.results)
+
                     res.data.results.map( currentuser => {
-                        //users.push([user.login.username,user.gender,user.dob.date])
                         user.username = currentuser.login.username
-                        user.gender = currentuser.gender
+                        user.gendre = currentuser.gender
                         user.dob = currentuser.dob.date
                         user.email = currentuser.email
                         user.photo = currentuser.picture.medium
-    
-                        //console.log(user)
-                        users.push(user)
-                    })
-    
-                })*/
 
-                axios.post("http://localhost:5000/users/add1", user)
-                    .then(res => {
-                        console.log(res.data)
+                        axios.post("http://localhost:5000/users/add1", user)
+                            .then(res => {
+                                console.log(res.data)
+                            })
+                            .catch((err) => {
+                                console.log(err)
+                        })
                     })
-                    .catch((err) => {
-                        console.log(err)
-                    })
+    
+            })
 
-            console.log(users)
+                
         }
-        
+        window.location = '/';
     }
 
     render(){

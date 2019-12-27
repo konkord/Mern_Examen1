@@ -7,11 +7,10 @@ const User = props => (
     <td>{props.user.username}</td>
     <td>{props.user.gendre}</td>
     <td>{props.user.dob.substring(0,10)}</td>
-    <td>{props.user.news}</td>
     <td>{props.user.email}</td>
-    <td>{props.user.photo}</td>
+    <td><img src={props.user.photo}/></td>
     <td>
-      <button type="button" className="btn btn-primary"><Link to={"/editUser/"+props.user._id}>edit</Link></button>
+      <button type="button" className="btn btn-primary"><Link to={"/editUser/"+props.user._id}>Edit</Link></button>
     </td>
     <td>
     <button type="button" className="btn btn-danger"><a href="#" onClick={() => { props.deleteUser(props.user._id) }}>delete</a></button>
@@ -25,8 +24,23 @@ export default class MoviesList extends Component {
 
 
     this.deleteUser = this.deleteUser.bind(this)
+    this.onChangeLimit = this.onChangeLimit.bind(this)
+    this.onChangePage = this.onChangePage.bind(this)
+    this.getData = this.getData.bind(this)
+    this.Option = this.Option.bind(this)
+    this.sortDate = this.sortDate.bind(this)
+    this.sortGendre = this.sortGendre.bind(this)
+    this.onChangeSearch = this.onChangeSearch.bind(this)
 
-    this.state = {users : []}
+    this.state = {
+      users : [],
+      page : 1,
+      limit : 10,
+      totalPages : 0,
+      search : '',
+      gendre : 1,
+      dob : 1,
+    }
 
   }
 
@@ -42,11 +56,31 @@ export default class MoviesList extends Component {
             .catch((err) => console.log(err))
   }
 
+  onChangeLimit(e){
+    this.setState({
+      limit : e.target.value
+    })
+
+    this.getData(e.target.value)
+  }
+
   componentDidMount(){
-      axios.get("http://localhost:5000/users/")
+      this.getData();
+  }
+
+  getData(limit,page,search,gendre,dob){
+
+    const p = page || this.state.page
+    const l = limit || this.state.limit
+    const s = search || this.state.search
+    const g = gendre || this.state.gendre
+    const d = dob || this.state.dob
+    
+    axios.get("http://localhost:5000/users/"+p+"/"+l+"?search="+s+"&gendre="+g+"&dob"+d)
         .then(res =>{
             this.setState({
-                users : res.data
+                users : res.data.docs ,
+                totalPages : res.data.totalPages
             })
         })
         .catch((err) =>{
@@ -54,6 +88,28 @@ export default class MoviesList extends Component {
         })
   }
 
+  onChangePage(e){
+    this.setState({
+      page : e.target.value
+    })
+
+    this.getData(null,e.target.value)
+  }
+  sortGendre(e){
+    this.setState({
+      gendre : this.state.gendre*-1
+    })
+
+    this.getData(null,null,null,this.state.gendre*-1)
+  }
+
+  sortDate(e){
+    this.setState({
+      dob : this.state.dob*-1
+    })
+
+    this.getData(null,null,null,null,this.state.dob*-1)
+  }
   movieList(){
      
       return this.state.users.map(currentuser => {
@@ -61,20 +117,82 @@ export default class MoviesList extends Component {
       })
   }
 
-  
+  onChangeSearch(e){
+
+    console.log('Search' + e.target.value)
+    if(e.target.value == "")
+    {
+      this.getData(null,null,"")
+    }else{
+       this.getData(null,null,e.target.value)
+    }
+   
+  }
+
+  Option()
+  {
+    let arr = []
+    for (let index = 1; index <= this.state.totalPages; index++) {
+      arr.push(index)
+    }
+    console.log('Array :' + arr)
+    return arr.map(e => {
+    return <option key = {e} value={e} >{e}</option>;
+  })
+  }
   render() {
     return (
       <div>
         <h3>Users List</h3>
 
-        
+        <div className="container">
+            <div className="form-group">
+                <label>Entries: </label>
+                  <div>
+                     <select ref="userInput"
+                        required
+                        className="form-control"
+                        value = {this.state.limit}
+                        onChange = {this.onChangeLimit}
+                     >
+                       <option></option>
+                       <option>10</option>
+                       <option>20</option>
+                       <option>30</option>
+                     </select>
+                  </div>
+            </div>
+            <div className="form-group">
+                <label>Pages: </label>
+                  <div>
+                     <select ref="userInput"
+                        required
+                        className="form-control"
+                        value = {this.state.page}
+                        onChange = {this.onChangePage}
+                     >
+                       <option></option>
+                      {this.Option()}
+                     </select>
+                  </div>
+            </div>
+            <div className="form-group">
+                <label>search: </label>
+                  <div>
+                  <input  type="text"
+                    required
+                    className="form-control"
+                    onChange={this.onChangeSearch}
+                    />
+                  </div>
+            </div>
+        </div>
         <table className="table">
           <thead className="thead-light table-sortable" >
             <tr>
               <th>Username</th>
-              <th>Gendre</th>
-              <th>Date of birth</th>
-              <th>News</th>
+              <th onClick={this.sortGendre}>Gendre</th>
+              <th onClick={this.sortDate}>Date of birth</th>
               <th>Email</th>
               <th>Image</th>
               <th colSpan="2">Action</th>

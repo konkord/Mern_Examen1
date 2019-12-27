@@ -10,9 +10,14 @@ router.route('/').get((req, res) => {
 
 router.route('/:page/:size').get((req, res) => {
 
+
+  const str = req.query.search || ''
+  const gendre = req.query.gendre || 1
+  const dob = req.query.gendre || 1
+
   const page = req.params.page;
   const size = req.params.size;
-  User.paginate({},{ page: page, limit: size })
+  User.paginate({ "username" : { $regex: str , $options: 'i' } },{ page: page, limit: size ,sort: { dob: dob , gendre: gendre}})
     .then(users => res.json(users))
     .catch(err => res.status(400).json('Error: ' + err));
 });

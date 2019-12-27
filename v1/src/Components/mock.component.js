@@ -44,24 +44,21 @@ export default class Mock extends Component{
 
         if(numbreUserToadd > 0){
 
-            const user = {
-                username : '',
-                gendre : '',
-                dob : '',
-                news : true,
-                email : '',
-                photo : ''
-            } 
+            
            axios.get("https://randomuser.me/api/?results="+numbreUserToadd)
                 .then(res => {
 
                     res.data.results.map( currentuser => {
-                        user.username = currentuser.login.username
-                        user.gendre = currentuser.gender
-                        user.dob = currentuser.dob.date
-                        user.email = currentuser.email
-                        user.photo = currentuser.picture.medium
-
+                        const user={
+                        username : currentuser.login.username,
+                        gendre : currentuser.gender,
+                        news : true,
+                        dob : currentuser.dob.date,
+                        email : currentuser.email,
+                        photo : currentuser.picture.medium
+                        }
+                        console.log(user)
+                        
                         axios.post("http://localhost:5000/users/add1", user)
                             .then(res => {
                                 console.log(res.data)
@@ -75,7 +72,7 @@ export default class Mock extends Component{
 
                 
         }
-        window.location = '/';
+        //window.location = '/';
     }
 
     render(){

@@ -6,7 +6,7 @@ const User = props => (
   <tr itemScope="row">
     <td>{props.user.username}</td>
     <td>{props.user.gendre}</td>
-    <td>{props.user.dob.substring(0,10)}</td>
+    <td>{props.user.dob}</td>
     <td>{props.user.email}</td>
     <td><img src={props.user.photo}/></td>
     <td>
@@ -171,7 +171,6 @@ export default class MoviesList extends Component {
                         value = {this.state.page}
                         onChange = {this.onChangePage}
                      >
-                       <option></option>
                       {this.Option()}
                      </select>
                   </div>
